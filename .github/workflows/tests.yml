@@ -1,0 +1,16 @@
+name: tests
+
+on: push
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.14"  # same as the local .venv
+      - run: pip install -r requirements.txt
+      # Run the tests inside a network namespace with no network access, so any
+      # test that tried to download something would fail.
+      - run: sudo unshare --net -- "$(which python)" -m pytest -q -p no:cacheprovider
